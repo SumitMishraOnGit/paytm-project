@@ -2,6 +2,7 @@ const zod = require("zod");
 const { User } = require("../db");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../config");
+const { authMiddleware } = require("../middleware");
 
 const signupbody = zod.object({
     username: zod.string().email(),
@@ -9,7 +10,7 @@ const signupbody = zod.object({
     firstName: zod.string(),
     lastName: zod.string()
 })
-
+// --------------- signup -----------------
 router.post('/signup', async( req, res )=>{
     const success = signupbody.safeParse(req.body);
     if( !success ){
@@ -50,11 +51,11 @@ const signinbody = zod.object({
     username: zod.string().email(),
     password: zod.string(),
 })
-
+// --------------- signin -----------------
 router.get('/signin', async( req, res )=>{
     const success = signupbody.safeParse(req.body);
     if( !success ){
-        res.status(411).json({ message: "Email already taken / Incorrect inputs" })
+        res.status(411).json({ message: "Invalid email / Incorrect inputs" })
     }
     
     const user = await User.findone({
@@ -72,4 +73,23 @@ router.get('/signin', async( req, res )=>{
     res.status(411).json({message: "error while logging in"})
 })
 
+const updatebody = zod.object({
+    password: zod.string().optional(),
+    firstName: zod.string().optional(),
+    lastName: zod.string().optional()
+})
+
+// --------------- update info -----------------
+router.put('/', authMiddleware, async(req, res) => {
+    const success = updatebodybody.safeParse(req.body);
+    if( !success ){
+        res.status(411).json({	message: "Error while updating information"})
+    }
+
+    await User.updateOne({_id: req.userId}, req.body);
+
+    res.json({
+        message: "Updated successfully"
+    })
+})
 module.exports = router;
