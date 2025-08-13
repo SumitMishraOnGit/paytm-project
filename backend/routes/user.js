@@ -7,7 +7,7 @@ const { authMiddleware } = require("../middleware");
 
 const router = express.Router();
 
-// USER SIGN UP
+// USER SIGN UP----------------------------
 
 const signupBody = zod.object({
   username: zod.string().email(),
@@ -68,7 +68,7 @@ router.post("/signup", async (req, res) => {
   });
 });
 
-// USER SIGN IN
+// USER SIGN IN----------------------------
 
 const signinBody = zod.object({
   username: zod.string().email(),
@@ -111,7 +111,7 @@ router.post("/signin", async (req, res) => {
   }
 });
 
-// FOR UPDATING USER INFO
+// FOR UPDATING USER INFO------------------
 
 const updateBody = zod.object({
   password: zod.string().optional(),
@@ -134,7 +134,7 @@ router.put("/", authMiddleware, async (req, res) => {
   });
 });
 
-// FOR GETTING USERS WITH FILTER QUERY
+// FOR GETTING USERS WITH FILTER QUERY-----
 
 router.get("/bulk", async (req, res) => {
   const filter = req.query.filter || "";
@@ -164,7 +164,7 @@ router.get("/bulk", async (req, res) => {
   });
 });
 
-// FOR GETTING CURRENT USER INFO
+// FOR GETTING CURRENT USER INFO-----------
 
 router.get("/getUser", authMiddleware, async (req, res) => {
   const user = await User.findOne({
