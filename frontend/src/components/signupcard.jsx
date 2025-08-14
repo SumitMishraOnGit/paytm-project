@@ -36,8 +36,6 @@ function SignupCard() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) {
-      // Logic to submit the form data to the backend
-      console.log('Form submitted successfully:', formData);
     }
   };
 

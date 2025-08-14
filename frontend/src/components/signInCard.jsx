@@ -33,7 +33,6 @@ function SigninCard() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) {
-      console.log('Form submitted successfully:', formData);
     }
   };
 
