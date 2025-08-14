@@ -38,7 +38,6 @@ function SignupCard() {
     if (validate()) {
       // Logic to submit the form data to the backend
       console.log('Form submitted successfully:', formData);
-      alert('Signup successful!');
     }
   };
 
