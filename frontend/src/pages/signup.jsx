@@ -1,6 +1,4 @@
-// frontend/src/pages/Signup.jsx
-import React from 'react';
-import SignupCard from '../components/SignupCard';
+import SignupCard from '../components/signUpCard';
 
 function Signup() {
   return (

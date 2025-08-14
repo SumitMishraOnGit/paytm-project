@@ -1,3 +1,5 @@
+// frontend/src/components/Input.jsx
+import React from 'react';
 
 function Input({ label, name, type, placeholder, value, onChange, error }) {
   return (
