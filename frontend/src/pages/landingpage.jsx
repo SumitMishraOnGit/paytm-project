@@ -71,7 +71,7 @@ const LandingPage = () => {
 
       {/* Footer */}
       <footer className="w-full max-w-4xl text-center text-sm text-gray-500 py-4 mt-8 border-t border-gray-300">
-        &copy; 2024 Payments App. All rights reserved.
+        &copy; 2025 Payments App. All rights reserved. -By Sumit Mishra
       </footer>
     </div>
   );
