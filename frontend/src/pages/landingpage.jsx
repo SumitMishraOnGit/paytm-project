@@ -6,7 +6,7 @@ const LandingPage = () => {
       
       {/* Navigation Bar */}
       <nav className="w-full max-w-4xl flex justify-between items-center py-4">
-        <h1 className="text-3xl font-bold tracking-tight">Payments App</h1>
+        <div className="text-2xl font-bold"><span className="text-base font-semibold">the</span>PaymentApp</div>
         <Link 
           to="/signup" 
           className="bg-gray-900 text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-700 transition-colors duration-200"
