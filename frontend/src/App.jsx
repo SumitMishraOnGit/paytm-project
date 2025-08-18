@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Signup from './pages/signup';
 import Signin from './pages/signin';
 import Dashboard from './pages/dashboard';
-import LandingPage from './pages/LandingPage'; 
+import LandingPage from './pages/landingpage'; 
 
 function App() {
   return (
