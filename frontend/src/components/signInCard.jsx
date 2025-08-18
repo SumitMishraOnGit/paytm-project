@@ -1,7 +1,5 @@
-// frontend/src/components/SigninCard.jsx
-
 import React, { useState } from 'react';
-import Input from './Input';
+import Input from './input';
 import { Link } from 'react-router-dom';
 
 function SigninCard() {

@@ -1,16 +1,44 @@
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
+import Input from './input';
 
-import React, { useState } from 'react';
-import Input from './Input';
 
-function SignupCard() {
+// Animated notification component
+function Notification({ message, type, onClose }) {
+  const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+  const icon = type === 'success' ? '✔' : '❗';
+
+  return (
+    <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg text-white shadow-lg flex items-center transition-all duration-300 transform ${message ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'} ${bgColor}`}>
+      <span className="text-xl mr-2">{icon}</span>
+      <span>{message}</span>
+      <button onClick={onClose} className="ml-4 text-white hover:text-gray-200">
+        &times;
+      </button>
+    </div>
+  );
+}
+
+// Signup form component
+export default function SignupCard() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     password: '',
   });
-
   const [errors, setErrors] = useState({});
+  const [notification, setNotification] = useState({ message: '', type: '' });
+  const navigate = useNavigate();
+
+  // Function to show notification
+  const showNotification = (message, type) => {
+    setNotification({ message, type });
+    setTimeout(() => {
+      setNotification({ message: '', type: '' });
+    }, 3000);
+  };
 
   const validate = () => {
     const newErrors = {};
@@ -33,14 +61,40 @@ function SignupCard() {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+    e.preventDefault(); // Stop the form from reloading the page
+
     if (validate()) {
+        try {
+            const response = await axios.post("http://localhost:5000/api/v1/user/signup", formData);
+
+            const data = response.data; 
+
+            console.log(data);
+            if(data.token) {
+                localStorage.setItem("token", data.token);
+                showNotification("Signup successful!", "success");
+                setTimeout(() => {
+                    navigate("/dashboard");
+                }, 2000); 
+            } else {
+                showNotification(data.message || "Signup failed", "error");
+            }
+        } catch (error) {
+            showNotification("An error occurred. Please try again.", "error");
+            console.error('Error:', error);
+        }
     }
-  };
+};
 
   return (
     <div className="bg-white p-6 sm:p-8 md:p-10 rounded-xl shadow-lg w-full max-w-sm">
+      <Notification 
+        message={notification.message}
+        type={notification.type}
+        onClose={() => setNotification({ message: '', type: '' })}
+      />
+      
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Sign Up</h1>
         <p className="text-gray-500 text-sm mt-1">
@@ -94,10 +148,8 @@ function SignupCard() {
       </form>
 
       <div className="text-center mt-6 text-sm text-gray-500">
-        Already have an account? <a href="/signin" className="font-semibold text-blue-600 hover:underline">Signin</a>
+        Already have an account? <Link to="/signin" className="font-semibold text-blue-600 hover:underline">Signin</Link>
       </div>
     </div>
   );
 }
-
-export default SignupCard;
