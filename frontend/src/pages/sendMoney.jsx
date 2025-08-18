@@ -5,7 +5,7 @@ import Notification from '../components/notification';
 
 export default function SendMoney() {
   const [amount, setAmount] = useState('');
-  const [balance, setBalance] = useState(null); // balance ke liye state add kiya
+  const [balance, setBalance] = useState(null); 
   const [notification, setNotification] = useState({ message: '', type: '' });
   const [loading, setLoading] = useState(false);
   const location = useLocation();
@@ -16,7 +16,6 @@ export default function SendMoney() {
   const toUserId = searchParams.get('to');
   const toUserName = searchParams.get('name');
 
-  // Notification dikhane ka function
   const showNotification = (message, type) => {
     setNotification({ message, type });
     setTimeout(() => {
@@ -24,7 +23,6 @@ export default function SendMoney() {
     }, 3000);
   };
   
-  // useEffect hook ka use karke balance fetch kiya
   useEffect(() => {
     const fetchBalance = async () => {
       const token = localStorage.getItem('token');
@@ -33,7 +31,7 @@ export default function SendMoney() {
         return;
       }
       try {
-        const response = await axios.get("https://paytm-backend-74hf.onrender.com/api/v1//account/balance", {
+        const response = await axios.get("api/v1/account/balance", {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -45,7 +43,7 @@ export default function SendMoney() {
       }
     };
     fetchBalance();
-  }, []); // Empty dependency array, taaki yeh sirf component mount hone par chale
+  }, []); 
 
   const handleTransfer = async (e) => {
     e.preventDefault();
@@ -63,7 +61,7 @@ export default function SendMoney() {
     const token = localStorage.getItem('token');
 
     try {
-      const response = await axios.post("https://paytm-backend-74hf.onrender.com/api/v1//account/transfer", {
+      const response = await axios.post("api/v1//account/transfer", {
         to: toUserId,
         amount: Number(amount),
       }, {
@@ -94,7 +92,7 @@ export default function SendMoney() {
         onClose={() => setNotification({ message: '', type: '' })}
       />
       <div className="bg-white p-6 sm:p-8 md:p-10 rounded-xl shadow-lg w-full max-w-md relative">
-        {balance !== null && ( // agar balance loaded hai to dikhao
+        {balance !== null && ( // balance dikhao
           <div className="absolute top-4 right-4 text-sm font-semibold text-gray-600">
             Balance: ${balance}
           </div>

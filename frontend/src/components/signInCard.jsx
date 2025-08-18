@@ -44,7 +44,7 @@ const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
       try {
-        const response = await axios.post("https://paytm-backend-74hf.onrender.com/api/v1/user/signin", {
+        const response = await axios.post("api/v1/user/signin", {
           // body
           username: formData.email,
           password: formData.password,
