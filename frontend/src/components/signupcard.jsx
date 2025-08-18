@@ -57,7 +57,7 @@ const handleSubmit = async (e) => {
                 password: formData.password
             };
 
-            const response = await axios.post("api/v1/user/signup", requestData, {
+            const response = await axios.post("https://paytm-backend-74hf.onrender.com/api/v1/user/signup", requestData, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
