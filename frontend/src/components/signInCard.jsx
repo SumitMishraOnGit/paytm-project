@@ -19,6 +19,14 @@ function Notification({ message, type, onClose }) {
   );
 }
 
+  // Function to show notification
+  const showNotification = (message, type) => {
+    setNotification({ message, type });
+    setTimeout(() => {
+      setNotification({ message: '', type: '' });
+    }, 3000);
+  };
+
 function SigninCard() {
   const [formData, setFormData] = useState({
     email: '',
@@ -115,6 +123,7 @@ return (
       {/* Signin Button */}
       <div className="pt-4">
         <button
+          onClick={handleSubmit}
           type="submit"
           className="w-full bg-black text-white py-2.5 rounded-lg font-medium transition duration-200 hover:bg-gray-800"
         >
