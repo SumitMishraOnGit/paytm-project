@@ -2,15 +2,31 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserItem } from './UserItem';
+import axios from 'axios';
+import { useEffect } from 'react';
 
-export function Users({ users }) {
+export function Users() {
   const [filter, setFilter] = useState('');
+  const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
-  const filteredUsers = users.filter(user =>
-    user.firstName.toLowerCase().includes(filter.toLowerCase()) ||
-    user.lastName.toLowerCase().includes(filter.toLowerCase())
-  );
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await axios.get(`http://localhost:5000/api/v1/user/bulk?filter=${filter}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        setUsers(response.data.user);
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      }
+    };
+
+    fetchUsers();
+  }, [filter]); 
 
   return (
     <div className="mt-8 p-4">
@@ -24,8 +40,8 @@ export function Users({ users }) {
       />
 
       <div className="mt-6 space-y-4">
-        {filteredUsers.map((user) => (
-          <UserItem key={user.id} user={user} onSendMoney={() => navigate(`/send?to=${user.id}&name=${user.firstName}`)} />
+        {users.map((user) => (
+          <UserItem key={user._id} user={user} onSendMoney={() => navigate(`/send?to=${user._id}&name=${user.firstName}`)} />
         ))}
       </div>
     </div>
