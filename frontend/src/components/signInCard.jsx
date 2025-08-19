@@ -19,13 +19,6 @@ function Notification({ message, type, onClose }) {
   );
 }
 
-  // Function to show notification
-  const showNotification = (message, type) => {
-    setNotification({ message, type });
-    setTimeout(() => {
-      setNotification({ message: '', type: '' });
-    }, 3000);
-  };
 
 function SigninCard() {
   const [formData, setFormData] = useState({
@@ -35,6 +28,15 @@ function SigninCard() {
 
   const [errors, setErrors] = useState({});
   const [notification, setNotification] = useState({ message: '', type: '' });
+  const navigate = useNavigate();
+
+    // Function to show notification
+  const showNotification = (message, type) => {
+    setNotification({ message, type });
+    setTimeout(() => {
+      setNotification({ message: '', type: '' });
+    }, 3000);
+  };
 
   const validate = () => {
     const newErrors = {};
