@@ -18,6 +18,7 @@ function Dashboard() {
       if (!token) {
         setLoading(false);
         setError('Authorization token not found.');
+        navigate('/signin');
         return;
       }
       
@@ -48,7 +49,7 @@ function Dashboard() {
       }
     };
     fetchData();
-  }, []); 
+  }, [navigate]);
 
   // Loading state handling
   if (loading) {
