@@ -61,7 +61,7 @@ export default function SendMoney() {
     const token = localStorage.getItem('token');
 
     try {
-      const response = await axios.post("https://paytm-backend-74hf.onrender.com/api/v1//account/transfer", {
+      const response = await axios.post("https://paytm-backend-74hf.onrender.com/api/v1/account/transfer", {
         to: toUserId,
         amount: Number(amount),
       }, {
