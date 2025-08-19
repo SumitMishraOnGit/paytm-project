@@ -31,13 +31,13 @@ function Dashboard() {
         await new Promise(resolve => setTimeout(resolve, 1500));
 
         // Balance fetch karne ka API call
-        const balanceResponse = await axios.get("http://localhost:5000/api/v1/account/balance", config);
+        const balanceResponse = await axios.get("https://paytm-backend-74hf.onrender.com/api/v1//account/balance", config);
         setBalance(balanceResponse.data.balance);
 
-        const userResponse = await axios.get("http://localhost:5000/api/v1/user/getUser", config);
+        const userResponse = await axios.get("https://paytm-backend-74hf.onrender.com/api/v1//user/getUser", config);
         setFirstName(userResponse.data.firstName);
 
-        const usersResponse = await axios.get("http://localhost:5000/api/v1/user/bulk?filter=", config);
+        const usersResponse = await axios.get("https://paytm-backend-74hf.onrender.com/api/v1//user/bulk?filter=", config);
         setUsers(usersResponse.data.user);
 
         setLoading(false);

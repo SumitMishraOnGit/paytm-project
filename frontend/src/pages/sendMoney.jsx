@@ -33,7 +33,7 @@ export default function SendMoney() {
         return;
       }
       try {
-        const response = await axios.get("http://localhost:5000/api/v1/account/balance", {
+        const response = await axios.get("https://paytm-backend-74hf.onrender.com/api/v1//account/balance", {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -63,7 +63,7 @@ export default function SendMoney() {
     const token = localStorage.getItem('token');
 
     try {
-      const response = await axios.post("http://localhost:5000/api/v1/account/transfer", {
+      const response = await axios.post("https://paytm-backend-74hf.onrender.com/api/v1//account/transfer", {
         to: toUserId,
         amount: Number(amount),
       }, {

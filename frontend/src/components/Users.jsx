@@ -14,7 +14,7 @@ export function Users() {
     const fetchUsers = async () => {
       const token = localStorage.getItem('token');
       try {
-        const response = await axios.get(`http://localhost:5000/api/v1/user/bulk?filter=${filter}`, {
+        const response = await axios.get(`https://paytm-backend-74hf.onrender.com/api/v1/user/bulk?filter=${filter}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
