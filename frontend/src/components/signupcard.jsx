@@ -62,15 +62,25 @@ export default function SignupCard() {
   };
 
 const handleSubmit = async (e) => {
-    e.preventDefault(); // Stop the form from reloading the page
+    e.preventDefault();
 
     if (validate()) {
         try {
-            const response = await axios.post("http://localhost:5000/api/v1/user/signup", formData);
+            const requestData = {
+                username: formData.email,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                password: formData.password
+            };
 
-            const data = response.data; 
+            const response = await axios.post("http://localhost:5000/api/v1/user/signup", requestData, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
 
-            console.log(data);
+            const data = response.data;
+            
             if(data.token) {
                 localStorage.setItem("token", data.token);
                 showNotification("Signup successful!", "success");
@@ -81,7 +91,7 @@ const handleSubmit = async (e) => {
                 showNotification(data.message || "Signup failed", "error");
             }
         } catch (error) {
-            showNotification("An error occurred. Please try again.", "error");
+            showNotification(error.response?.data?.message || "An error occurred. Please try again.", "error");
             console.error('Error:', error);
         }
     }
