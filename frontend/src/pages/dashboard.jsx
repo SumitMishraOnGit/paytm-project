@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppBar } from '../components/Appbar';
 import { Balance } from '../components/Balance';
 import { Users } from '../components/Users';
@@ -10,6 +11,7 @@ function Dashboard() {
   const [firstName, setFirstName] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,7 +53,6 @@ function Dashboard() {
     fetchData();
   }, [navigate]);
 
-  // Loading state handling
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 p-4">
