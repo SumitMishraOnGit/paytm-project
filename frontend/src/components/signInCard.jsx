@@ -50,9 +50,9 @@ function SigninCard() {
           password: formData.password,
         }, {
           headers: {
-              'Content-Type': 'application/json'
-            }
-          });
+            'Content-Type': 'application/json'
+          }
+        });
 
         const data = response.data;
 
@@ -113,8 +113,7 @@ function SigninCard() {
         {/* Signin Button */}
         <div className="pt-4">
           <button
-            onClick={handleSubmit}
-            type="submit"
+            type="submit" 
             className="w-full bg-black text-white py-2.5 rounded-lg font-medium transition duration-200 hover:bg-gray-800"
           >
             Sign In
