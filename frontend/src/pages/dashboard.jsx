@@ -14,43 +14,59 @@ function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
-      // Auth token ko localStorage se uthao
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setLoading(false);
-        setError('Authorization token not found.');
-        navigate('/signin');
-        return;
+    // Auth token ko localStorage se uthao
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setLoading(false);
+      setError('Authorization token not found.');
+      navigate('/signin');
+      return;
+    }
+    
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`
       }
-      
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      };
+    };
 
+    const fetchData = async () => {
       try {
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // Ek hi API call mein user data, users list, aur balance fetch karein
+        const [userResponse, usersResponse, balanceResponse] = await Promise.all([
+          axios.get("https://paytm-backend-74hf.onrender.com/api/v1/user/getUser", config),
+          axios.get("https://paytm-backend-74hf.onrender.com/api/v1/user/bulk?filter=", config),
+          axios.get("https://paytm-backend-74hf.onrender.com/api/v1/account/balance", config)
+        ]);
 
-        // Balance fetch karne ka API call
-        const balanceResponse = await axios.get("https://paytm-backend-74hf.onrender.com/api/v1/account/balance", config);
-        setBalance(balanceResponse.data.balance);
-
-        const userResponse = await axios.get("https://paytm-backend-74hf.onrender.com/api/v1/user/getUser", config);
         setFirstName(userResponse.data.firstName);
-
-        const usersResponse = await axios.get("https://paytm-backend-74hf.onrender.com/api/v1/user/bulk?filter=", config);
         setUsers(usersResponse.data.user);
-
+        setBalance(balanceResponse.data.balance);
         setLoading(false);
       } catch (err) {
-        setError("Failed to fetch data. Please try again.");
+        setError("Failed to fetch initial data. Please try again.");
         setLoading(false);
         console.error("API call error:", err);
       }
     };
+
+    const fetchBalancePeriodically = async () => {
+      try {
+        const balanceResponse = await axios.get("https://paytm-backend-74hf.onrender.com/api/v1/account/balance", config);
+        setBalance(balanceResponse.data.balance);
+      } catch (err) {
+        console.error("Polling error: Could not fetch balance.", err);
+      }
+    };
+    
+    // Initial data fetch
     fetchData();
+
+    // Polling logic: har 5 seconds mein balance fetch karo
+    const intervalId = setInterval(fetchBalancePeriodically, 5000);
+
+    // Cleanup function: component unmount hone par interval ko clear karein
+    return () => clearInterval(intervalId);
+
   }, [navigate]);
 
   if (loading) {
@@ -90,7 +106,6 @@ function Dashboard() {
     );
   }
 
-  // Error state handling
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
