@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const { authMiddleware } = require("../middleware");
 const JWT_SECRET = process.env.JWT_SECRET;
 
+const router = express.Router();
+
 const signupbody = zod.object({
     username: zod.string().email(),
     password: zod.string(),
