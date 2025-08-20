@@ -1,9 +1,10 @@
+
 const zod = require("zod");
 const { User, Account } = require("../db"); 
 const jwt = require("jsonwebtoken");
 const { authMiddleware } = require("../middleware");
+const mongoose = require("mongoose");
 
-// JWT_SECRET ko environment variable se load karna hai
 const JWT_SECRET = process.env.JWT_SECRET;
 const express = require('express');
 const router = express.Router();
@@ -32,23 +33,45 @@ router.post('/signup', async (req, res) => {
         });
     }
 
-    const user = await User.create({ // `new` ko `await` ke saath `create` se replace kiya
-        username: req.body.username,
-        password: req.body.password,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName
-    });
-    
-    const userId = user._id;
+    // Start a session for transaction
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    const token = jwt.sign({
-        userId
-    }, JWT_SECRET);
+    try {
+        const user = await User.create([{
+            username: req.body.username,
+            password: req.body.password,
+            firstName: req.body.firstName,
+            lastName: req.body.lastName
+        }], { session });
+        
+        const userId = user[0]._id;
 
-    res.json({
-        message: "User created successfully",
-        token: token
-    });
+        // Create account with random initial balance
+        await Account.create([{
+            userId,
+            balance: 1 + Math.random() * 10000
+        }], { session });
+
+        const token = jwt.sign({
+            userId
+        }, JWT_SECRET);
+
+        await session.commitTransaction();
+
+        res.json({
+            message: "User created successfully",
+            token: token
+        });
+    } catch (error) {
+        await session.abortTransaction();
+        console.error("Signup error:", error);
+        res.status(500).json({
+            message: "Internal server error"
+        });
+    } finally {
+        session.endSession();
+    }
 });
 
 const signinbody = zod.object({
@@ -57,27 +80,33 @@ const signinbody = zod.object({
 });
 
 // --------------- signin -----------------
-// GET ko POST mein change kiya
 router.post('/signin', async (req, res) => {
     const { success } = signinbody.safeParse(req.body);
     if (!success) {
-        return res.status(411).json({ message: "Invalid email or password format" });
+        return res.status(400).json({ message: "Invalid email or password format" });
     }
     
-    // findone ko findOne mein change kiya
-    const user = await User.findOne({
-        username: req.body.username,
-        password: req.body.password
-    });
+    try {
+        const user = await User.findOne({
+            username: req.body.username,
+            password: req.body.password
+        });
 
-    if (user) {
-        const token = jwt.sign({
-            userId: user._id 
-        }, JWT_SECRET);
-        return res.status(200).json({ token: token });
+        if (user) {
+            const token = jwt.sign({
+                userId: user._id 
+            }, JWT_SECRET);
+            return res.status(200).json({ 
+                message: "Signin successful",
+                token: token 
+            });
+        }
+
+        res.status(401).json({ message: "Invalid email or password" }); 
+    } catch (error) {
+        console.error("Signin error:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
-
-    res.status(411).json({ message: "Invalid email or password" }); 
 });
 
 const updatebody = zod.object({
@@ -101,7 +130,7 @@ router.put('/', authMiddleware, async(req, res) => {
     });
 });
 
-// bulk users route add kiya hai
+// bulk users route
 router.get("/bulk", authMiddleware, async (req, res) => {
     const filter = req.query.filter || "";
 
@@ -109,12 +138,14 @@ router.get("/bulk", authMiddleware, async (req, res) => {
         $or: [
             {
                 firstName: {
-                    "$regex": filter
+                    "$regex": filter,
+                    "$options": "i"
                 }
             },
             {
                 lastName: {
-                    "$regex": filter
+                    "$regex": filter,
+                    "$options": "i"
                 }
             }
         ]
@@ -129,7 +160,6 @@ router.get("/bulk", authMiddleware, async (req, res) => {
         }))
     });
 });
-
 
 router.get("/getUser", authMiddleware, async(req, res) => {
     try {

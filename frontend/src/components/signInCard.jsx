@@ -88,7 +88,7 @@ function SigninCard() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form className="space-y-4">
         {/* Email Input */}
         <Input
           label="Email"
@@ -113,7 +113,8 @@ function SigninCard() {
         {/* Signin Button */}
         <div className="pt-4">
           <button
-            type="submit" 
+            type="submit"
+            onClick={handleSubmit}
             className="w-full bg-black text-white py-2.5 rounded-lg font-medium transition duration-200 hover:bg-gray-800"
           >
             Sign In
