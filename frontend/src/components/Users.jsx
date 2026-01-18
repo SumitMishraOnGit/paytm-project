@@ -5,6 +5,9 @@ import { UserItem } from './UserItem';
 import axios from 'axios';
 import { useEffect } from 'react';
 
+// Use localhost for testing
+const API_BASE = "http://localhost:5000/api/v1";
+
 export function Users() {
   const [filter, setFilter] = useState('');
   const [users, setUsers] = useState([]);
@@ -14,7 +17,7 @@ export function Users() {
     const fetchUsers = async () => {
       const token = localStorage.getItem('token');
       try {
-        const response = await axios.get(`https://paytm-backend-74hf.onrender.com/api/v1/user/bulk?filter=${filter}`, {
+        const response = await axios.get(`${API_BASE}/user/bulk?filter=${filter}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -26,7 +29,7 @@ export function Users() {
     };
 
     fetchUsers();
-  }, [filter]); 
+  }, [filter]);
 
   return (
     <div className="mt-8 p-4">

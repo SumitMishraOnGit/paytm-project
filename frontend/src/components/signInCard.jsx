@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import Input from './input';
 import Notification from '../components/notification';
+
+// Use localhost for testing
+const API_BASE = "http://localhost:5000/api/v1";
 
 function SigninCard() {
   const [formData, setFormData] = useState({
@@ -13,6 +16,14 @@ function SigninCard() {
   const [errors, setErrors] = useState({});
   const [notification, setNotification] = useState({ message: '', type: '' });
   const navigate = useNavigate();
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      window.location.href = '/dashboard';
+    }
+  }, []);
 
   // Function to show notification
   const showNotification = (message, type) => {
@@ -44,7 +55,7 @@ function SigninCard() {
     e.preventDefault();
     if (validate()) {
       try {
-        const response = await axios.post("https://paytm-backend-74hf.onrender.com/api/v1/user/signin", {
+        const response = await axios.post(`${API_BASE}/user/signin`, {
           // body
           username: formData.email,
           password: formData.password,
@@ -60,8 +71,8 @@ function SigninCard() {
           localStorage.setItem("token", data.token);
           showNotification("Signin successful!", "success");
           setTimeout(() => {
-            navigate("/dashboard");
-          }, 2000);
+            window.location.href = '/dashboard';
+          }, 1500);
         } else {
           showNotification(data.message || "Signin failed", "error");
         }

@@ -1,16 +1,21 @@
 
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+
 const zod = require("zod");
 const bcrypt = require("bcrypt");
 const { User, Account } = require("../db");
 const jwt = require("jsonwebtoken");
 const { authMiddleware } = require("../middleware");
 const mongoose = require("mongoose");
+const express = require('express');
 
 // Number of salt rounds for bcrypt hashing
 const SALT_ROUNDS = 10;
 
 const JWT_SECRET = process.env.JWT_SECRET;
-const express = require('express');
+console.log("JWT_SECRET loaded:", JWT_SECRET ? "✅ Yes" : "❌ No"); // Debug log
+
 const router = express.Router();
 
 const signupbody = zod.object({
@@ -54,10 +59,11 @@ router.post('/signup', async (req, res) => {
 
         const userId = user[0]._id;
 
-        // Create account with random initial balance
+        // Create account with zero initial balance
+        // Users must add money through verified payment gateway (Razorpay)
         await Account.create([{
             userId,
-            balance: 1 + Math.random() * 10000
+            balance: 0
         }], { session });
 
         const token = jwt.sign({
@@ -155,11 +161,12 @@ router.put('/', authMiddleware, async (req, res) => {
     }
 });
 
-// bulk users route
+// bulk users route - returns all users except the logged-in user
 router.get("/bulk", authMiddleware, async (req, res) => {
     const filter = req.query.filter || "";
 
     const users = await User.find({
+        _id: { $ne: req.userId }, // Exclude the current logged-in user
         $or: [
             {
                 firstName: {

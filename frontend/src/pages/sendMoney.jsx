@@ -3,14 +3,17 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Notification from '../components/notification';
 
+// Use localhost for testing
+const API_BASE = "http://localhost:5000/api/v1";
+
 export default function SendMoney() {
   const [amount, setAmount] = useState('');
-  const [balance, setBalance] = useState(null); 
+  const [balance, setBalance] = useState(null);
   const [notification, setNotification] = useState({ message: '', type: '' });
   const [loading, setLoading] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // URL se `to` aur `name` parameters nikalna
   const searchParams = new URLSearchParams(location.search);
   const toUserId = searchParams.get('to');
@@ -22,7 +25,7 @@ export default function SendMoney() {
       setNotification({ message: '', type: '' });
     }, 3000);
   };
-  
+
   useEffect(() => {
     const fetchBalance = async () => {
       const token = localStorage.getItem('token');
@@ -31,7 +34,7 @@ export default function SendMoney() {
         return;
       }
       try {
-        const response = await axios.get("https://paytm-backend-74hf.onrender.com/api/v1/account/balance", {
+        const response = await axios.get(`${API_BASE}/account/balance`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -43,7 +46,7 @@ export default function SendMoney() {
       }
     };
     fetchBalance();
-  }, []); 
+  }, []);
 
   const handleTransfer = async (e) => {
     e.preventDefault();
@@ -53,15 +56,15 @@ export default function SendMoney() {
     }
 
     if (!toUserId || toUserId === 'undefined') {
-        showNotification("Invalid user to send money to.", "error");
-        return;
+      showNotification("Invalid user to send money to.", "error");
+      return;
     }
 
     setLoading(true);
     const token = localStorage.getItem('token');
 
     try {
-      const response = await axios.post("https://paytm-backend-74hf.onrender.com/api/v1/account/transfer", {
+      const response = await axios.post(`${API_BASE}/account/transfer`, {
         to: toUserId,
         amount: Number(amount),
       }, {
@@ -70,7 +73,12 @@ export default function SendMoney() {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
+      // Update balance from response if available
+      if (response.data.newBalance !== undefined) {
+        setBalance(response.data.newBalance);
+      }
+
       showNotification(response.data.message, "success");
       setTimeout(() => {
         navigate('/dashboard');
@@ -86,7 +94,7 @@ export default function SendMoney() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <Notification 
+      <Notification
         message={notification.message}
         type={notification.type}
         onClose={() => setNotification({ message: '', type: '' })}
@@ -94,7 +102,7 @@ export default function SendMoney() {
       <div className="bg-white p-6 sm:p-8 md:p-10 rounded-xl shadow-lg w-full max-w-md relative">
         {balance !== null && ( // balance dikhao
           <div className="absolute top-4 right-4 text-sm font-semibold text-gray-600">
-            Balance: ${balance}
+            Balance: ₹{balance}
           </div>
         )}
         <div className="text-center mb-6">
