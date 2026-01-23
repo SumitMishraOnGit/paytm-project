@@ -1,5 +1,6 @@
 const express = require("express");
 const { authMiddleware } = require("../middleware");
+const { transferLimiter } = require("../middleware/rateLimiter");
 const { Account, Transaction, User } = require("../db");
 const mongoose = require("mongoose");
 
@@ -26,7 +27,8 @@ router.get("/balance", authMiddleware, async (req, res) => {
 });
 
 // --------------- P2P Transfer with Transaction Records -----------------
-router.post("/transfer", authMiddleware, async (req, res) => {
+// Rate limit: 10 transfers per minute per user
+router.post("/transfer", authMiddleware, transferLimiter, async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 

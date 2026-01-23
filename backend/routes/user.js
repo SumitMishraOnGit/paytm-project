@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 const { User, Account } = require("../db");
 const jwt = require("jsonwebtoken");
 const { authMiddleware } = require("../middleware");
+const { signupLimiter, authLimiter } = require('../middleware/rateLimiter');
 const mongoose = require("mongoose");
 const express = require('express');
 
@@ -26,7 +27,8 @@ const signupbody = zod.object({
 });
 
 // --------------- signup -----------------
-router.post('/signup', async (req, res) => {
+// Rate limit: 3 signups per hour per IP
+router.post('/signup', signupLimiter, async (req, res) => {
     const { success } = signupbody.safeParse(req.body);
     if (!success) {
         return res.status(411).json({ message: "Email already taken / Incorrect inputs" });
@@ -93,7 +95,8 @@ const signinbody = zod.object({
 });
 
 // --------------- signin -----------------
-router.post('/signin', async (req, res) => {
+// Rate limit: 5 attempts per 15 minutes per IP
+router.post('/signin', authLimiter, async (req, res) => {
     const { success } = signinbody.safeParse(req.body);
     if (!success) {
         return res.status(400).json({ message: "Invalid email or password format" });
